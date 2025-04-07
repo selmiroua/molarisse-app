@@ -1,0 +1,198 @@
+<div class="dashboard-container">
+  <div class="animated-background"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="isMenuOpen">
+    <div class="sidebar-header">
+      <div class="logo">
+        <img src="assets/images/mmolarissee.png" width="60" height="150">
+          <span>Molarisse</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- Existing links -->
+      <a (click)="showDashboard()" [class.active]="activeSection === 'dashboard'">
+        <i class="fas fa-th-large"></i> Dashboard
+      </a>
+      <a (click)="showPatients()" [class.active]="activeSection === 'patients'">
+        <i class="fas fa-user-injured"></i> Patients
+      </a>
+      <a (click)="showAppointments()" [class.active]="activeSection === 'appointments'">
+        <i class="fas fa-calendar-alt"></i> Appointments
+      </a>
+      <a (click)="showTreatments()" [class.active]="activeSection === 'treatments'">
+        <i class="fas fa-tooth"></i> Treatments
+      </a>
+      <a (click)="showPharmacy()" [class.active]="activeSection === 'pharmacy'">
+        <i class="fas fa-prescription-bottle-alt"></i> Pharmacy
+      </a>
+      <a (click)="showHistory()" [class.active]="activeSection === 'history'">
+        <i class="fas fa-history"></i> History
+      </a>
+      <a (click)="showHelpCentre()" [class.active]="activeSection === 'helpCentre'">
+        <i class="fas fa-question-circle"></i> Help Centre
+      </a>
+      <a (click)="showSettings()" [class.active]="activeSection === 'settings'">
+        <i class="fas fa-cog"></i> Settings
+      </a>
+      <!-- Add the demande link here -->
+      <a (click)="showDemande()" [class.active]="activeSection === 'demande'">
+        <i class="fas fa-user-plus"></i> Demande
+      </a>
+    </nav>
+
+
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="main-header">
+      <div class="header-left">
+        <button class="menu-toggle" (click)="toggleMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="search-container">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search..." />
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="notification-icon">
+          <i class="fas fa-envelope"></i>
+          <span class="badge">1</span>
+        </div>
+        <div class="notification-icon">
+          <i class="fas fa-bell"></i>
+          <span class="badge">3</span>
+        </div>
+        <div class="profile-dropdown">
+          <button class="profile-btn" (click)="toggleProfileDropdown()">
+            <div class="avatar">
+              <img src="assets/images/doc.png" alt="Dr. Aroua Youssef">
+            </div>
+            <span>{{ doctorName }}</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="dropdown-content" [class.show]="isProfileDropdownOpen">
+            <a (click)="showProfile()"><i class="fas fa-user"></i> Profile</a>
+            <a (click)="showSettings()"><i class="fas fa-cog"></i> Settings</a>
+            <a (click)="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="content" *ngIf="activeSection === 'dashboard'">
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div class="welcome-info">
+          <h3>Good {{ timeOfDay }},</h3>
+          <h1>{{ doctorName }}</h1>
+          <p>Your schedule today.</p>
+
+          <div class="stats-circles">
+            <div class="stat-circle appointments">
+              <div class="circle-icon">
+                <i class="fas fa-tooth"></i>
+              </div>
+              <div class="circle-value">{{ appointmentsCount }}</div>
+              <div class="circle-label">Appointments</div>
+            </div>
+
+            <div class="stat-circle surgeries">
+              <div class="circle-icon">
+                <i class="fas fa-syringe"></i>
+              </div>
+              <div class="circle-value">{{ surgeriesCount }}</div>
+              <div class="circle-label">Procedures</div>
+            </div>
+          </div>
+        </div>
+        <div class="welcome-illustration">
+          <img src="assets/images/wave-pattern.png" alt="Dental Illustration">
+        </div>
+      </div>
+
+
+    </div>
+    <!-- Requests Content -->
+<div class="content" *ngIf="activeSection === 'requests'">
+  <div class="requests-container">
+    <h2>Demandes de Rejoindre</h2>
+    <table class="requests-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let request of requests">
+          <td>{{ request.name }}</td>
+          <td>{{ request.email }}</td>
+          <td>
+            <span [class]="request.status">{{ request.status }}</span>
+          </td>
+          <td>
+            <button *ngIf="request.status === 'en cours'" (click)="acceptRequest(request)">Accepter</button>
+            <button *ngIf="request.status === 'en cours'" (click)="rejectRequest(request)">Refuser</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+    <!-- Profile Content -->
+    <div class="content" *ngIf="activeSection === 'profile'">
+      <app-profile></app-profile>
+    </div>
+
+    <!-- Patients Content -->
+    <div class="content" *ngIf="activeSection === 'patients'">
+      <!-- Patients content here -->
+    </div>
+
+    <!-- Appointments Content -->
+    <div class="content" *ngIf="activeSection === 'appointments'">
+      <!-- Appointments content here -->
+    </div>
+
+    <!-- Treatments Content -->
+    <div class="content" *ngIf="activeSection === 'treatments'">
+      <!-- Treatments content here -->
+    </div>
+
+    <!-- Pharmacy Content -->
+    <div class="content" *ngIf="activeSection === 'pharmacy'">
+      <!-- Pharmacy content here -->
+    </div>
+
+    <!-- History Content -->
+    <div class="content" *ngIf="activeSection === 'history'">
+      <!-- History content here -->
+    </div>
+
+    <!-- Help Centre Content -->
+    <div class="content" *ngIf="activeSection === 'helpCentre'">
+      <!-- Help Centre content here -->
+    </div>
+
+    <!-- Settings Content -->
+    <div class="content" *ngIf="activeSection === 'settings'">
+      <!-- Settings content here -->
+    </div>
+    <div class="content" *ngIf="activeSection === 'demande'">
+      <app-demande></app-demande>
+
+    </div>
+
+
+  </main>
+</div>

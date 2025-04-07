@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css?family=Muli:400,600&display=swap');
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #accffe;
+  font-family: "Muli-Regular", sans-serif;
+  color: #999;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+
+  .image-1 {
+    position: absolute;
+    bottom: 150px; // Adjust this value to move the image up or down
+    left: 360px; // Adjust this value to move the image left or right
+    z-index: 50;
+    width: 200px; // Adjust the width if needed
+    height: auto; // Maintain aspect ratio
+  }
+  
+  .image-2 {
+    position: absolute;
+    bottom: 175px; // Adjust this value to move the image up or down
+    right: 340px; // Adjust this value to move the image left or right
+    z-index: 30;
+    width: 200px; // Adjust the width if needed
+    height: auto; // Maintain aspect ratio
+  }
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 40px;
+  height: 750px;
+  width: 100%;
+  max-width: 435px;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  position: relative;
+  z-index: 9;
+
+  h2 {
+    text-transform: uppercase;
+    font-size: 25px;
+    font-family: "Muli-SemiBold", sans-serif;
+    color: #333;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0px; // Reduced gap between fields
+
+  .form-holder {
+    position: relative;
+    margin-bottom: 0px; // Reduced margin bottom
+
+    mat-form-field {
+      width: 100%;
+
+      ::ng-deep {
+        .mat-mdc-form-field-flex {
+          background-color: transparent;
+        }
+
+        .mat-mdc-form-field-outline {
+          border-bottom: 1px solid #e6e6e6;
+        }
+
+        .mat-mdc-text-field-wrapper {
+          border-radius: 0;
+        }
+
+        .mdc-text-field--outlined {
+          --mdc-outlined-text-field-container-shape: 0;
+        }
+
+        .mat-mdc-form-field-icon-prefix {
+          color: #333;
+        }
+      }
+    }
+  }
+}
+
+button[type="submit"] {
+  border: none;
+  width: 100%;
+  height: 49px;
+  margin-top: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: #99ccff;
+  color: #fff;
+  text-transform: uppercase;
+  font-family: "Muli-SemiBold", sans-serif;
+  font-size: 15px;
+  letter-spacing: 2px;
+  transition: all 0.5s;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    background: #007aa3;
+  }
+}
+
+.social-login {
+  margin-top: 10px;
+  position: relative;
+
+  p {
+    color: #666;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .social-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+
+    button {
+      &.google-btn {
+        background-color: #DB4437;
+      }
+
+      &.facebook-btn {
+        background-color: #4267B2;
+      }
+
+      &.apple-btn {
+        background-color: #000000;
+      }
+
+      i {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
+
+.auth-footer {
+  margin-top: 20px;
+  color: #666;
+  font-size: 14px;
+
+  a {
+    color: #0093c4;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      color: #007aa3;
+      text-decoration: underline;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .auth-card {
+    padding: 20px;
+  }
+
+  .image-1, .image-2 {
+    display: none;
+  }
+}

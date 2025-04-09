@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableJpaAuditing
 @EnableAsync
 @ComponentScan(basePackages = "com.projet.molarisse")
-public class MolarisseApplication {
+public class  MolarisseApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(MolarisseApplication.class, args);

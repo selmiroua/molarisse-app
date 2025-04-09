@@ -1,5 +1,6 @@
 package com.projet.molarisse.security;
 
+import com.projet.molarisse.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,40 +13,21 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
-@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
     private final JwtFilter jwtAuthFilter;
+    private final UserRepository userRepository;
     private final AuthenticationProvider authenticationProvider;
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        System.out.println("CORS configuration initialized");
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
-        configuration.setMaxAge(3600L);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+    private final SimpleCorsFilter simpleCorsFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(AbstractHttpConfigurer::disable) // Disable Spring Security's CORS handling
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(
@@ -69,6 +51,10 @@ public class SecurityConfig {
                                 // Allow demande pictures viewing
                                 .requestMatchers(HttpMethod.GET, "/api/v1/demandes/pictures/**").permitAll()
 
+                                // Allow doctors endpoints
+                                .requestMatchers(HttpMethod.GET, "/api/users/doctors").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/users/doctors/accepted").permitAll()
+
                                 // Demande endpoints (authenticated but no specific role required)
                                 .requestMatchers(HttpMethod.POST, "/api/v1/demandes").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/demandes/check").authenticated()
@@ -90,6 +76,7 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
+                .addFilterBefore(simpleCorsFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

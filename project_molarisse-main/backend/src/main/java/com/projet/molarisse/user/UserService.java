@@ -15,11 +15,15 @@ import com.projet.molarisse.role.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.projet.molarisse.role.RoleRepository;
+import java.util.List;
+import com.projet.molarisse.demande.Demande;
+import com.projet.molarisse.demande.DemandeRepository;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final DemandeRepository demandeRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileStorageService fileStorageService;
     private final RoleRepository roleRepository;
@@ -145,5 +149,25 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Admin role not found"));
         return userRepository.findFirstByRole(adminRole)
                 .orElseThrow(() -> new RuntimeException("Admin user not found"));
+    }
+
+    public List<User> getAllDoctors() {
+        Role doctorRole = roleRepository.findByNom(Role.DOCTOR)
+                .orElseThrow(() -> new RuntimeException("Doctor role not found"));
+        return userRepository.findByRole(doctorRole);
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> getAcceptedDoctors() {
+        logger.info("Fetching accepted doctors");
+        // Find all approved demandes
+        List<Demande> approvedDemandes = demandeRepository.findByStatus(Demande.Status.APPROVED);
+        // Extract the users (doctors) from the approved demandes
+        List<User> acceptedDoctors = approvedDemandes.stream()
+                                                   .map(Demande::getUser)
+                                                   .filter(user -> user != null && user.getRole().getNom().equals(Role.DOCTOR))
+                                                   .toList();
+        logger.info("Found {} accepted doctors", acceptedDoctors.size());
+        return acceptedDoctors;
     }
 }

@@ -2,7 +2,10 @@ import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   console.log('[AuthInterceptor] Intercepting request to:', req.url);
-  const token = localStorage.getItem('access_token');
+
+  // Check if we're in a browser environment
+  const isBrowser = typeof window !== 'undefined' && window.localStorage;
+  const token = isBrowser ? localStorage.getItem('access_token') : null;
   console.log('[AuthInterceptor] Found token:', token ? 'Yes' : 'No');
 
   // Clone the request with withCredentials set to true

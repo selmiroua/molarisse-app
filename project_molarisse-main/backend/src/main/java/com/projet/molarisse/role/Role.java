@@ -18,13 +18,13 @@ import java.util.List;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Role {
-    public static final String ADMIN = "admin";
-    public static final String DOCTOR = "doctor";
-    public static final String SECRETAIRE = "secretaire";
-    public static final String PATIENT = "patient";
-    public static final String LABO = "labo";
-    public static final String FOURNISSEUR = "fournisseur";
-    public static final String PHARMACIE = "pharmacie";
+    public static final String ADMIN = "ADMIN";
+    public static final String DOCTOR = "DOCTOR";
+    public static final String SECRETAIRE = "SECRETAIRE";
+    public static final String PATIENT = "PATIENT";
+    public static final String LABO = "LABO";
+    public static final String FOURNISSEUR = "FOURNISSEUR";
+    public static final String PHARMACIE = "PHARMACIE";
 
     @Id
     @GeneratedValue

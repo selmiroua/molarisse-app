@@ -142,6 +142,7 @@ public class AuthenticationService {
             
             return AuthenticationResponse.builder()
                     .token(jwtToken)
+                    .fullName(authenticatedUser.fullname())
                     .role(authenticatedUser.getRole().getNom())
                     .build();
         } catch (Exception e) {

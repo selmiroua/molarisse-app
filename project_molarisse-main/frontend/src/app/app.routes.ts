@@ -14,8 +14,14 @@ import { ProfileComponent } from './profile/profile.component';
 import { DemandeComponent } from './demande/demande.component';
 import { DemandeConfirmationComponent } from './demande/demande-confirmation.component';
 import { DemandeManagementComponent } from "./demande-management/demande-management.component";
+import { LandingComponent } from './landing/landing.component';
+import { DoctorSelectionComponent } from './doctor-selection/doctor-selection.component';
 
 export const routes: Routes = [
+  {
+    path: 'landing',
+    component: LandingComponent
+  },
   {
     path: 'login',
     component: LoginComponent
@@ -28,7 +34,12 @@ export const routes: Routes = [
     path: 'activate-account',
     component: ActivateAccountComponent
   },
-
+  {
+    path: 'select-doctor',
+    component: DoctorSelectionComponent,
+    canActivate: [AuthGuard],
+    data: { role: 'secretaire' }
+  },
   {
     path: 'dashboard',
     canActivate: [AuthGuard], // Protect the entire dashboard
@@ -37,8 +48,6 @@ export const routes: Routes = [
         path: 'admin',
        component: AdminDashboardComponent,
         data: { role: 'admin' },
-
-
       },
       {
         path: 'patient',
@@ -86,17 +95,16 @@ export const routes: Routes = [
         path: 'demande-management',
         component: DemandeManagementComponent
       }
-
     ]
   },
+
   {
     path: '',
-    redirectTo: '/login',
+    redirectTo: '/landing',
     pathMatch: 'full'
   },
   {
     path: '**',
-    canActivate: [AuthGuard],
-    component: LoginComponent
+    redirectTo: '/landing'
   }
 ];

@@ -406,6 +406,13 @@ export class DemandeComponent implements OnInit {
     // Store the data in the service
     this.demandeDataService.setDemandeData(demandeData);
 
+    // Show success message
+    this.snackBar.open(
+      'Votre demande a été soumise avec succès',
+      'Fermer',
+      { duration: 5000, panelClass: ['success-snackbar'] }
+    );
+
     // Navigate to the confirmation page
     this.router.navigate(['/dashboard/demande/confirmation']);
   }

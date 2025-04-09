@@ -1,0 +1,37 @@
+<div class="selection-container">
+  <h1>Choisir un Médecin</h1>
+  <p>Sélectionnez le médecin avec lequel vous souhaitez travailler.</p>
+
+  <div *ngIf="acceptedDoctors$ | async as doctors; else loading">
+    <div *ngIf="doctors.length > 0; else noDoctorsAvailable" class="doctor-list">
+      <mat-card *ngFor="let doctor of doctors" class="doctor-card">
+        <mat-card-header>
+          <img mat-card-avatar [src]="profileImageService.getProfileImageUrl(doctor.profilePicturePath)" alt="Photo {{ doctor.nom }}">
+          <mat-card-title>{{ doctor.nom }} {{ doctor.prenom }}</mat-card-title>
+          <mat-card-subtitle>{{ doctor.email }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Téléphone: {{ doctor.phoneNumber || 'N/A' }}</p>
+          <p>Adresse: {{ doctor.address || 'N/A' }}</p>
+          <!-- Add any other relevant info here -->
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary" (click)="selectDoctor(doctor)">
+            <mat-icon>check_circle</mat-icon>
+            Sélectionner
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+    <ng-template #noDoctorsAvailable>
+      <p class="info-message">Aucun médecin accepté disponible pour le moment.</p>
+    </ng-template>
+  </div>
+
+  <ng-template #loading>
+    <div class="loading-indicator">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Chargement des médecins...</p>
+    </div>
+  </ng-template>
+</div>

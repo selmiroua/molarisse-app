@@ -12,9 +12,9 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     console.log('AuthGuard.canActivate called for URL:', state.url);
     console.log('Is authenticated:', this.authService.isAuthenticated());
     console.log('User role:', this.authService.getUserRole());
-    
-    const userRole = this.authService.getUserRole();
-    const requiredRole = route.data['role'];
+
+    const userRole = this.authService.getUserRole()?.toLowerCase();
+    const requiredRole = route.data['role']?.toLowerCase();
     const isAuthenticated = this.authService.isAuthenticated();
 
     // For all protected pages that require authentication
@@ -28,15 +28,15 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     if (state.url.includes('/dashboard/')) {
       // Extract the role from the URL
       const urlParts = state.url.split('/');
-      const urlRole = urlParts[2]; // dashboard/{role}
-      
+      const urlRole = urlParts[2]?.toLowerCase(); // dashboard/{role}
+
       console.log('URL role:', urlRole);
       console.log('User role:', userRole);
-      
+
       // If user tries to access a dashboard that doesn't match their role
-      if (userRole && urlRole && userRole.toLowerCase() !== urlRole.toLowerCase()) {
+      if (userRole && urlRole && userRole !== urlRole) {
         console.log('User trying to access unauthorized dashboard, redirecting to their dashboard');
-        this.router.navigate([`/dashboard/${userRole.toLowerCase()}`]);
+        this.router.navigate([`/dashboard/${userRole}`]);
         return false;
       }
     }
@@ -44,7 +44,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     // For pages that require a specific role
     if (requiredRole && userRole && userRole !== requiredRole) {
       console.log('User does not have required role, redirecting to their dashboard');
-      this.router.navigate([`/dashboard/${userRole.toLowerCase()}`]);
+      this.router.navigate([`/dashboard/${userRole}`]);
       return false;
     }
 

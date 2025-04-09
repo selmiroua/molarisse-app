@@ -1,0 +1,2 @@
+-- This file is intentionally left empty as Hibernate will create the tables automatically
+-- with the ddl-auto: update setting in application-dev.yml 

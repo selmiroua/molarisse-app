@@ -33,6 +33,6 @@ export class DemandeConfirmationComponent implements OnInit {
   goToDashboard(): void {
     // Clear the data when navigating away
     this.demandeDataService.clearDemandeData();
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/dashboard/demande']);
   }
 }

@@ -5,6 +5,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../auth/auth.service';
 import { ProfileComponent } from '../profile/profile.component';
 import { HttpClient } from '@angular/common/http';
+import { AsyncPipe } from '@angular/common';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { ProfileService, UserProfile } from '../profile/profile.service';
+import { ProfileImageService } from '../shared/profile-image.service';
 
 interface Notification {
   id: number;
@@ -20,18 +25,20 @@ interface Notification {
     CommonModule,
     RouterModule,
     MatButtonModule,
-    ProfileComponent
+    ProfileComponent,
+    AsyncPipe
   ],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss']
 })
 export class AdminDashboardComponent implements OnInit {
+  userName$: Observable<string>;
+  userProfile?: UserProfile;
   isMenuOpen = false; // Controls sidebar visibility on mobile
   isProfileDropdownOpen = false; // Controls profile dropdown visibility
   activeSection = 'dashboard'; // Tracks the active section
 
   // Dynamic doctor information
-  doctorName = 'Dr. Aroua Youssef'; // Will be set dynamically from user login
   timeOfDay = 'Morning'; // Will be updated based on current time
 
   // Statistics
@@ -54,12 +61,18 @@ export class AdminDashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private http: HttpClient
-  ) {}
+    private http: HttpClient,
+    private profileService: ProfileService,
+    private profileImageService: ProfileImageService
+  ) {
+    this.userName$ = this.authService.currentUser$.pipe(
+      map(user => user?.name || 'Admin')
+    );
+    this.updateTimeOfDay();
+  }
 
-  ngOnInit() {
-    this.setTimeOfDay();
-    this.loadDoctorInfo();
+  ngOnInit(): void {
+    this.loadUserProfile();
     this.loadNotifications();
     // Refresh notifications every minute
     setInterval(() => {
@@ -67,8 +80,23 @@ export class AdminDashboardComponent implements OnInit {
     }, 60000);
   }
 
-  // Set time of day greeting based on current time
-  setTimeOfDay() {
+  private loadUserProfile(): void {
+    this.profileService.getCurrentProfile().subscribe({
+      next: (profile) => {
+        this.userProfile = profile;
+        console.log('Loaded user profile:', profile);
+      },
+      error: (error) => {
+        console.error('Error loading user profile:', error);
+      }
+    });
+  }
+
+  getProfileImageUrl(): string {
+    return this.profileImageService.getProfileImageUrl(this.userProfile?.profilePicturePath);
+  }
+
+  private updateTimeOfDay(): void {
     const hour = new Date().getHours();
     if (hour < 12) {
       this.timeOfDay = 'Morning';
@@ -79,25 +107,20 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  // Load doctor information from auth service
-  loadDoctorInfo() {
-    // In a real application, this would come from the authentication service
-    // For now, we'll use the default value
-  }
-
   // Toggle sidebar on mobile
-  toggleMenu() {
+  toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
   // Toggle profile dropdown
-  toggleProfileDropdown() {
+  toggleProfileDropdown(): void {
     this.isProfileDropdownOpen = !this.isProfileDropdownOpen;
   }
 
   // Navigate to Dashboard
-  showDashboard() {
+  showDashboard(): void {
     this.activeSection = 'dashboard';
+    this.isProfileDropdownOpen = false;
   }
 
   // Navigate to Patients
@@ -131,12 +154,13 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   // Navigate to Settings
-  showSettings() {
+  showSettings(): void {
     this.activeSection = 'settings';
+    this.isProfileDropdownOpen = false;
   }
 
   // Navigate to Profile
-  showProfile() {
+  showProfile(): void {
     this.activeSection = 'profile';
     this.isProfileDropdownOpen = false;
   }
@@ -146,7 +170,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   // Logout the user
-  logout() {
+  logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }

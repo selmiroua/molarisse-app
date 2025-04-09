@@ -1,0 +1,331 @@
+<!-- Header/Navigation -->
+<mat-toolbar color="primary" class="main-header">
+  <div class="logo-container">
+    <img src="assets/images/logo.png" alt="Molarisse Logo" class="logo">
+    <span class="brand-name">Molarisse</span>
+  </div>
+
+  <div class="nav-links">
+    <a mat-button (click)="scrollToSection('services')">
+      <mat-icon>medical_services</mat-icon>
+      Services
+    </a>
+    <a mat-button (click)="scrollToSection('doctors')">
+      <mat-icon>people</mat-icon>
+      Nos Médecins
+    </a>
+    <a mat-button (click)="scrollToSection('testimonials')">
+      <mat-icon>star</mat-icon>
+      Témoignages
+    </a>
+    <a mat-button (click)="scrollToSection('contact')">
+      <mat-icon>contact_support</mat-icon>
+      Contact
+    </a>
+    <a mat-button routerLink="/select-doctor">
+      <mat-icon>admin_panel_settings</mat-icon>
+      Espace Secrétaire
+    </a>
+  </div>
+
+  <div class="auth-buttons">
+    <button mat-stroked-button color="accent" routerLink="/login">
+      <mat-icon>login</mat-icon>
+      Connexion
+    </button>
+    <button mat-raised-button color="accent" routerLink="/sign-in">
+      <mat-icon>person_add</mat-icon>
+      Inscription
+    </button>
+  </div>
+</mat-toolbar>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1>Votre Santé Bucco-Dentaire est Notre Priorité</h1>
+    <p>Des soins dentaires de qualité pour toute la famille dans un environnement confortable et moderne.</p>
+    <div class="hero-buttons">
+      <button mat-raised-button color="primary" (click)="scrollToSection('appointment')">Prendre Rendez-vous</button>
+      <button mat-stroked-button color="accent" (click)="scrollToSection('services')">Découvrir Nos Services</button>
+    </div>
+  </div>
+  <div class="hero-image">
+    <img src="assets/images/dental.jpg" alt="Clinique Dentaire">
+  </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="services-section">
+  <div class="section-header">
+    <h2>Nos Services</h2>
+    <p>Des soins dentaires complets pour répondre à tous vos besoins</p>
+  </div>
+
+  <div class="services-grid">
+    <mat-card *ngFor="let service of services" class="service-card">
+      <mat-card-header>
+        <mat-icon [style.color]="service.color">{{ service.icon }}</mat-icon>
+        <mat-card-title>{{ service.title }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ service.description }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>
+
+<!-- Doctors Section -->
+<section id="doctors" class="doctors-section">
+  <div class="section-header">
+    <h2>Nos Médecins</h2>
+    <p>Une équipe de professionnels qualifiés et expérimentés</p>
+  </div>
+
+  <div class="doctors-grid">
+    <mat-card *ngFor="let doctor of doctors" class="doctor-card">
+      <img [src]="doctor.image" [alt]="doctor.name" class="doctor-image">
+      <mat-card-header>
+        <mat-card-title>{{ doctor.name }}</mat-card-title>
+        <mat-card-subtitle>{{ doctor.specialty }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="doctor-rating">
+          <mat-icon color="accent">star</mat-icon>
+          <span>{{ doctor.rating }}</span>
+          <span class="reviews">({{ doctor.reviews }} avis)</span>
+        </div>
+        <p class="experience">{{ doctor.experience }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-stroked-button color="primary">Voir le Profil</button>
+        <button mat-raised-button color="accent">Prendre RDV</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+  <div class="section-header">
+    <h2>Pourquoi Nous Choisir</h2>
+    <p>Nous nous engageons à vous offrir les meilleurs soins dentaires</p>
+  </div>
+
+  <div class="features-grid">
+    <div *ngFor="let feature of features" class="feature-item">
+      <mat-icon color="primary">{{ feature.icon }}</mat-icon>
+      <h3>{{ feature.title }}</h3>
+      <p>{{ feature.description }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section id="testimonials" class="testimonials-section">
+  <div class="section-header">
+    <h2>Ce Que Disent Nos Patients</h2>
+    <p>Découvrez les expériences de nos patients satisfaits</p>
+  </div>
+
+  <div class="testimonials-grid">
+    <mat-card *ngFor="let testimonial of testimonials" class="testimonial-card">
+      <mat-card-header>
+        <img [src]="testimonial.image" [alt]="testimonial.name" class="testimonial-image">
+        <mat-card-title>{{ testimonial.name }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="rating">
+          <mat-icon *ngFor="let star of [].constructor(testimonial.rating)" color="accent">star</mat-icon>
+        </div>
+        <p class="testimonial-text">{{ testimonial.text }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>
+
+<!-- Appointment Section -->
+<section id="appointment" class="appointment-section">
+  <div class="appointment-content">
+    <div class="appointment-info">
+      <h2>Prenez Rendez-vous</h2>
+      <p>Réservez votre consultation en ligne en quelques clics</p>
+      <ul class="appointment-benefits">
+        <li><mat-icon color="primary">check_circle</mat-icon> Rendez-vous en ligne 24/7</li>
+        <li><mat-icon color="primary">check_circle</mat-icon> Confirmation immédiate</li>
+        <li><mat-icon color="primary">check_circle</mat-icon> Rappel par email et SMS</li>
+        <li><mat-icon color="primary">check_circle</mat-icon> Modification facile</li>
+      </ul>
+    </div>
+    <div class="appointment-form">
+      <mat-card>
+        <mat-card-content>
+          <form [formGroup]="appointmentForm" (ngSubmit)="onSubmitAppointment()">
+            <mat-form-field appearance="outline">
+              <mat-label>Nom complet</mat-label>
+              <input matInput formControlName="fullName">
+              <mat-error *ngIf="appointmentForm.get('fullName')?.hasError('required')">
+                Le nom est requis
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email">
+              <mat-error *ngIf="appointmentForm.get('email')?.hasError('required')">
+                L'email est requis
+              </mat-error>
+              <mat-error *ngIf="appointmentForm.get('email')?.hasError('email')">
+                Veuillez entrer un email valide
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Téléphone</mat-label>
+              <input matInput formControlName="phone">
+              <mat-error *ngIf="appointmentForm.get('phone')?.hasError('required')">
+                Le téléphone est requis
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Service</mat-label>
+              <mat-select formControlName="service">
+                <mat-option *ngFor="let service of services" [value]="service.title">
+                  {{ service.title }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="appointmentForm.get('service')?.hasError('required')">
+                Le service est requis
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date souhaitée</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="date">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-error *ngIf="appointmentForm.get('date')?.hasError('required')">
+                La date est requise
+              </mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" class="submit-btn" type="submit">Réserver</button>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact-section">
+  <div class="section-header">
+    <h2>Contactez-Nous</h2>
+    <p>Nous sommes là pour répondre à toutes vos questions</p>
+  </div>
+
+  <div class="contact-content">
+    <div class="contact-info">
+      <div class="contact-item">
+        <mat-icon color="primary">location_on</mat-icon>
+        <div>
+          <h3>Adresse</h3>
+          <p>123 Avenue des Dentistes, 75001 Paris</p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <mat-icon color="primary">phone</mat-icon>
+        <div>
+          <h3>Téléphone</h3>
+          <p>+33 1 23 45 67 89</p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <mat-icon color="primary">email</mat-icon>
+        <div>
+          <h3>Email</h3>
+          <p>contact&#64;molarisse.fr</p>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <mat-icon color="primary">access_time</mat-icon>
+        <div>
+          <h3>Horaires</h3>
+          <p>Lun-Ven: 9h-19h<br>Sam: 9h-17h<br>Dim: Fermé</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-map">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937595!2d2.292292615509614!3d48.858370079287475!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e2964e34e2d%3A0x8ddca9ee380ef7e0!2sTour%20Eiffel!5e0!3m2!1sfr!2sfr!4v1625147225208!5m2!1sfr!2sfr"
+        width="100%"
+        height="450"
+        style="border:0;"
+        allowfullscreen=""
+        loading="lazy">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="main-footer">
+  <div class="footer-content">
+    <div class="footer-logo">
+      <img src="assets/images/logo.png" alt="Molarisse Logo" class="logo">
+      <span class="brand-name">Molarisse</span>
+      <p>Votre clinique dentaire de confiance</p>
+    </div>
+
+    <div class="footer-links">
+      <h3>Liens Rapides</h3>
+      <ul>
+        <li><a (click)="scrollToSection('services')">Services</a></li>
+        <li><a (click)="scrollToSection('doctors')">Nos Médecins</a></li>
+        <li><a (click)="scrollToSection('testimonials')">Témoignages</a></li>
+        <li><a (click)="scrollToSection('contact')">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-services">
+      <h3>Nos Services</h3>
+      <ul>
+        <li *ngFor="let service of services">
+          <a>{{ service.title }}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="footer-social">
+      <h3>Suivez-Nous</h3>
+      <div class="social-icons">
+        <a href="#" class="social-icon">
+          <mat-icon>facebook</mat-icon>
+        </a>
+        <a href="#" class="social-icon">
+          <mat-icon>twitter</mat-icon>
+        </a>
+        <a href="#" class="social-icon">
+          <mat-icon>instagram</mat-icon>
+        </a>
+        <a href="#" class="social-icon">
+          <mat-icon>linkedin</mat-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2023 Molarisse. Tous droits réservés.</p>
+    <div class="legal-links">
+      <a href="#">Mentions légales</a>
+      <a href="#">Politique de confidentialité</a>
+      <a href="#">CGU</a>
+    </div>
+  </div>
+</footer>

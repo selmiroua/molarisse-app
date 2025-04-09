@@ -4,7 +4,6 @@ import { RouterModule, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../auth/auth.service';
 import { ProfileComponent } from '../profile/profile.component';
-import { DoctorsComponent } from '../doctors/doctors.component';
 
 @Component({
   selector: 'app-patient-dashboard',
@@ -14,7 +13,7 @@ import { DoctorsComponent } from '../doctors/doctors.component';
     RouterModule,
     MatButtonModule,
     ProfileComponent,
-    DoctorsComponent
+
   ],
   templateUrl: './patient-dashboard.component.html',
   styleUrls: ['./patient-dashboard.component.scss']

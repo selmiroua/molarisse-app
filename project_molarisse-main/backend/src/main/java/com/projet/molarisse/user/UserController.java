@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -97,5 +98,27 @@ public class UserController {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Backend is working correctly");
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/doctors")
+    public ResponseEntity<List<User>> getAllDoctors() {
+        System.out.println("Fetching all doctors");
+        List<User> doctors = userService.getAllDoctors();
+        System.out.println("Found " + doctors.size() + " doctors");
+        return ResponseEntity.ok(doctors);
+    }
+
+    @GetMapping("/doctors/accepted")
+    public ResponseEntity<List<User>> getAcceptedDoctors() {
+        System.out.println("=== getAcceptedDoctors endpoint called ===");
+        System.out.println("Request path: /api/users/doctors/accepted");
+        List<User> acceptedDoctors = userService.getAcceptedDoctors();
+        System.out.println("Found " + acceptedDoctors.size() + " accepted doctors");
+        return ResponseEntity.ok(acceptedDoctors);
+    }
+    
+    @RequestMapping(value = "/doctors/accepted", method = RequestMethod.OPTIONS)
+    public ResponseEntity<?> handleDoctorsAcceptedOptions() {
+        return ResponseEntity.ok().build();
     }
 }

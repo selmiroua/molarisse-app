@@ -35,13 +35,32 @@ public class JwtFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        logger.info("Processing request: {} {}", request.getMethod(), request.getRequestURI());
+        String requestPath = request.getServletPath();
+        String requestMethod = request.getMethod();
+        logger.info("Processing request: {} {} {}", requestMethod, requestPath);
         
-        if(request.getServletPath().contains("/auth")) {
-            logger.info("Skipping authentication for /auth endpoint");
+        // Skip authentication for public endpoints and OPTIONS requests
+        if(requestPath.contains("/auth") || 
+           requestPath.equals("/api/users/doctors") ||
+           requestPath.equals("/api/users/doctors/accepted") ||
+           requestPath.equals("/api/users/test") ||
+           requestMethod.equals("OPTIONS")) {
+            logger.info("Skipping authentication for public endpoint or OPTIONS request: {} {}", requestMethod, requestPath);
             filterChain.doFilter(request, response);
             return;
         }
+        
+        // Add CORS headers for preflight requests
+        if (requestMethod.equals("OPTIONS")) {
+            response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+            response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers");
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+            response.setHeader("Access-Control-Max-Age", "3600");
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+        
         try {
             final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             logger.info("Authorization Header: {}", authHeader);
@@ -85,5 +104,29 @@ public class JwtFilter extends OncePerRequestFilter {
             logger.error("Error processing JWT token", e);
             throw e;
         }
+    }
+
+    private boolean isPublicEndpoint(String requestPath, String requestMethod) {
+        // Auth endpoints
+        if (requestPath.startsWith("/api/v1/auth/")) {
+            return true;
+        }
+
+        // Profile picture endpoints
+        if (requestPath.startsWith("/api/v1/users/profile/picture/")) {
+            return true;
+        }
+
+        // Demande picture endpoints
+        if (requestPath.startsWith("/api/v1/demandes/picture/")) {
+            return true;
+        }
+
+        // Doctors endpoint
+        if (requestPath.equals("/api/users/doctors") && requestMethod.equals("GET")) {
+            return true;
+        }
+
+        return false;
     }
 }

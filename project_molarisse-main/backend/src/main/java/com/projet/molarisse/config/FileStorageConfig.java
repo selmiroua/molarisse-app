@@ -1,18 +1,20 @@
 package com.projet.molarisse.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
 
+import jakarta.validation.constraints.NotBlank;
+
+@Getter
+@Setter
+@Validated
 @Configuration
 @ConfigurationProperties(prefix = "file")
 public class FileStorageConfig {
+    
+    @NotBlank(message = "Upload directory must be specified")
     private String uploadDir;
-
-    public String getUploadDir() {
-        return uploadDir;
-    }
-
-    public void setUploadDir(String uploadDir) {
-        this.uploadDir = uploadDir;
-    }
 }

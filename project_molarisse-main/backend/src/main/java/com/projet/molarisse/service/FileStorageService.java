@@ -60,17 +60,21 @@ public class FileStorageService {
     public Resource loadFileAsResource(String fileName) {
         try {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
-            System.out.println("Looking for file at: " + filePath.toAbsolutePath());
+            System.out.println("FileStorageService - Looking for file at: " + filePath.toAbsolutePath());
+            System.out.println("FileStorageService - File exists: " + Files.exists(filePath));
+            System.out.println("FileStorageService - File is readable: " + Files.isReadable(filePath));
+            System.out.println("FileStorageService - Storage location: " + this.fileStorageLocation.toAbsolutePath());
+            
             Resource resource = new UrlResource(filePath.toUri());
             if(resource.exists()) {
-                System.out.println("File found: " + filePath.toAbsolutePath());
+                System.out.println("FileStorageService - Resource exists and is readable");
                 return resource;
             } else {
-                System.err.println("File not found: " + filePath.toAbsolutePath());
+                System.err.println("FileStorageService - File not found: " + filePath.toAbsolutePath());
                 throw new RuntimeException("File not found " + fileName);
             }
         } catch (MalformedURLException ex) {
-            System.err.println("Malformed URL: " + ex.getMessage());
+            System.err.println("FileStorageService - Malformed URL: " + ex.getMessage());
             throw new RuntimeException("File not found " + fileName, ex);
         }
     }

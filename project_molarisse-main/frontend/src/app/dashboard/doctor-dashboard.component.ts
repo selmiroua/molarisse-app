@@ -10,6 +10,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ProfileService, UserProfile } from '../profile/profile.service';
 import { ProfileImageService } from '../shared/profile-image.service';
+import { AppointmentListComponent } from './appointment/appointment-list.component';
+import { DemandeService } from '../demande/demande.service';
 
 @Component({
   selector: 'app-doctor-dashboard',
@@ -20,7 +22,8 @@ import { ProfileImageService } from '../shared/profile-image.service';
     MatButtonModule,
     ProfileComponent,
     DemandeComponent,
-    AsyncPipe
+    AsyncPipe,
+    AppointmentListComponent
   ],
   templateUrl: './doctor-dashboard.component.html',
   styleUrls: ['./doctor-dashboard.component.scss']
@@ -31,6 +34,9 @@ export class DoctorDashboardComponent implements OnInit {
   isMenuOpen = false; // Controls sidebar visibility on mobile
   isProfileDropdownOpen = false; // Controls profile dropdown visibility
   activeSection = 'dashboard'; // Tracks the active section
+  isApproved = false;
+  hasPendingRequest = false;
+  demandeStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
 
   // Dynamic doctor information
   timeOfDay = 'Morning'; // Will be updated based on current time
@@ -48,11 +54,14 @@ export class DoctorDashboardComponent implements OnInit {
     { name: 'John Doe', email: 'john@example.com', status: 'en cours' },
   ];
 
+  private _imageTimestamp: number = new Date().getTime();
+
   constructor(
     private authService: AuthService,
     private router: Router,
     private profileService: ProfileService,
-    private profileImageService: ProfileImageService
+    private profileImageService: ProfileImageService,
+    private demandeService: DemandeService
   ) {
     this.userName$ = this.authService.currentUser$.pipe(
       map(user => user?.name || 'Doctor')
@@ -62,6 +71,31 @@ export class DoctorDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUserProfile();
+    this.checkDemandeStatus();
+  }
+
+  private checkDemandeStatus(): void {
+    this.demandeService.getCurrentUserDemande().subscribe({
+      next: (demande) => {
+        if (demande) {
+          this.demandeStatus = demande.status;
+          this.isApproved = demande.status === 'APPROVED';
+          this.hasPendingRequest = demande.status === 'PENDING';
+          
+          if (!this.isApproved) {
+            this.activeSection = 'demande';
+          }
+        } else {
+          this.activeSection = 'demande';
+          this.isApproved = false;
+          this.hasPendingRequest = false;
+        }
+      },
+      error: (error) => {
+        console.error('Error checking demande status:', error);
+        this.activeSection = 'demande';
+      }
+    });
   }
 
   private loadUserProfile(): void {
@@ -77,7 +111,7 @@ export class DoctorDashboardComponent implements OnInit {
   }
 
   getProfileImageUrl(): string {
-    return this.profileImageService.getProfileImageUrl(this.userProfile?.profilePicturePath);
+    return this.profileImageService.getProfileImageUrl(this.userProfile?.profilePicturePath || '', undefined);
   }
 
   private updateTimeOfDay(): void {
@@ -93,48 +127,64 @@ export class DoctorDashboardComponent implements OnInit {
 
   // Toggle sidebar on mobile
   toggleMenu(): void {
-    this.isMenuOpen = !this.isMenuOpen;
+    if (this.isApproved) {
+      this.isMenuOpen = !this.isMenuOpen;
+    }
   }
 
-  // Toggle profile dropdown
+  // Toggle profile dropdown - No approval check
   toggleProfileDropdown(): void {
     this.isProfileDropdownOpen = !this.isProfileDropdownOpen;
   }
 
   // Navigate to Dashboard
   showDashboard(): void {
-    this.activeSection = 'dashboard';
-    this.isProfileDropdownOpen = false;
+    if (this.isApproved) {
+      this.activeSection = 'dashboard';
+      this.isProfileDropdownOpen = false;
+    }
   }
 
   // Navigate to Patients
-  showPatients() {
-    this.activeSection = 'patients';
+  showPatients(): void {
+    if (this.isApproved) {
+      this.activeSection = 'patients';
+    }
   }
 
   // Navigate to Appointments
-  showAppointments() {
-    this.activeSection = 'appointments';
+  showAppointments(): void {
+    if (this.isApproved) {
+      this.activeSection = 'appointments';
+    }
   }
 
   // Navigate to Treatments (new for dental)
-  showTreatments() {
-    this.activeSection = 'treatments';
+  showTreatments(): void {
+    if (this.isApproved) {
+      this.activeSection = 'treatments';
+    }
   }
 
   // Navigate to Pharmacy
-  showPharmacy() {
-    this.activeSection = 'pharmacy';
+  showPharmacy(): void {
+    if (this.isApproved) {
+      this.activeSection = 'pharmacy';
+    }
   }
 
   // Navigate to History
-  showHistory() {
-    this.activeSection = 'history';
+  showHistory(): void {
+    if (this.isApproved) {
+      this.activeSection = 'history';
+    }
   }
 
   // Navigate to Help Centre
-  showHelpCentre() {
-    this.activeSection = 'helpCentre';
+  showHelpCentre(): void {
+    if (this.isApproved) {
+      this.activeSection = 'helpCentre';
+    }
   }
 
   // Navigate to Requests
@@ -142,22 +192,24 @@ export class DoctorDashboardComponent implements OnInit {
     this.activeSection = 'requests';
   }
 
-  // Navigate to Settings
+  // Navigate to Profile - No approval check
+  showProfile(): void {
+    this.activeSection = 'profile';
+    this.isProfileDropdownOpen = false;
+  }
+
+  // Navigate to Settings - No approval check
   showSettings(): void {
     this.activeSection = 'settings';
     this.isProfileDropdownOpen = false;
   }
 
-  // Navigate to Profile
-  showProfile(): void {
-    this.activeSection = 'profile';
-    this.isProfileDropdownOpen = false;
-  }
-  showDemande() {
+  // Demande - No approval check
+  showDemande(): void {
     this.activeSection = 'demande';
   }
 
-  // Logout the user
+  // Logout - No approval check
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

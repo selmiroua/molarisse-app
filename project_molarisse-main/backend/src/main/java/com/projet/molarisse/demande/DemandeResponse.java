@@ -1,11 +1,13 @@
 package com.projet.molarisse.demande;
 
+import com.projet.molarisse.user.User;
 import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
 public class DemandeResponse {
     private Long id;
+    private User user;
     private String nom;
     private String prenom;
     private String email;
@@ -29,6 +31,7 @@ public class DemandeResponse {
 
     public DemandeResponse(Demande demande) {
         this.id = demande.getId();
+        this.user = demande.getUser();
         this.nom = demande.getNom();
         this.prenom = demande.getPrenom();
         this.email = demande.getEmail();
@@ -40,12 +43,23 @@ public class DemandeResponse {
         this.specialite = demande.getSpecialite();
         this.autreSpecialite = demande.getAutreSpecialite();
         this.aCabinet = demande.isACabinet();
-        this.nomCabinet = demande.getNomCabinet();
-        this.adresseCabinet = demande.getAdresseCabinet();
-        this.villeCabinet = demande.getVilleCabinet();
-        this.codePostalCabinet = demande.getCodePostalCabinet();
+        
+        // Only set cabinet information if the doctor has a cabinet
+        if (demande.isACabinet()) {
+            this.nomCabinet = demande.getNomCabinet();
+            this.adresseCabinet = demande.getAdresseCabinet();
+            this.villeCabinet = demande.getVilleCabinet();
+            this.codePostalCabinet = demande.getCodePostalCabinet();
+            this.photoCabinetPath = demande.getPhotoCabinetPath();
+        } else {
+            this.nomCabinet = null;
+            this.adresseCabinet = null;
+            this.villeCabinet = null;
+            this.codePostalCabinet = null;
+            this.photoCabinetPath = null;
+        }
+        
         this.photoPath = demande.getPhotoPath();
-        this.photoCabinetPath = demande.getPhotoCabinetPath();
         this.photoDiplomePath = demande.getPhotoDiplomePath();
         this.status = demande.getStatus().toString();
         this.createdAt = demande.getCreatedAt();

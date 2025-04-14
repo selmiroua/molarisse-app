@@ -2,6 +2,7 @@ package com.projet.molarisse.user;
 
 import com.projet.molarisse.dto.ProfileUpdateRequest;
 import com.projet.molarisse.service.FileStorageService;
+import com.projet.molarisse.config.FileStorageConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -11,19 +12,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.projet.molarisse.dto.DoctorWithSpecialityDTO;
+import com.projet.molarisse.demande.DemandeService;
+import com.projet.molarisse.demande.DemandeResponse;
 
 import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
 public class UserController {
     private final UserService userService;
     private final FileStorageService fileStorageService;
+    private final DemandeService demandeService;
+    private final FileStorageConfig fileStorageConfig;
 
     @GetMapping("/profile")
     public ResponseEntity<User> getCurrentUserProfile(Authentication authentication) {
@@ -68,13 +77,26 @@ public class UserController {
     public ResponseEntity<Resource> getProfilePicture(@PathVariable String fileName) {
         System.out.println("Profile picture requested: " + fileName);
         try {
+            Path filePath = Paths.get(fileStorageConfig.getUploadDir()).resolve(fileName).normalize();
+            System.out.println("Looking for file at absolute path: " + filePath.toAbsolutePath());
+            System.out.println("File exists: " + Files.exists(filePath));
+            
             Resource resource = fileStorageService.loadFileAsResource(fileName);
+            String contentType = "image/jpeg";
+            if (fileName.toLowerCase().endsWith(".png")) {
+                contentType = "image/png";
+            } else if (fileName.toLowerCase().endsWith(".gif")) {
+                contentType = "image/gif";
+            }
+            System.out.println("Serving file with content type: " + contentType);
+            
             return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG)
+                    .contentType(MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
         } catch (Exception e) {
             System.err.println("Error loading profile picture: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.notFound().build();
         }
     }
@@ -109,12 +131,36 @@ public class UserController {
     }
 
     @GetMapping("/doctors/accepted")
-    public ResponseEntity<List<User>> getAcceptedDoctors() {
+    public ResponseEntity<List<DoctorWithSpecialityDTO>> getAcceptedDoctors() {
         System.out.println("=== getAcceptedDoctors endpoint called ===");
-        System.out.println("Request path: /api/users/doctors/accepted");
-        List<User> acceptedDoctors = userService.getAcceptedDoctors();
-        System.out.println("Found " + acceptedDoctors.size() + " accepted doctors");
-        return ResponseEntity.ok(acceptedDoctors);
+        List<DemandeResponse> acceptedDemandes = demandeService.findAllAcceptedDoctors();
+        
+        List<DoctorWithSpecialityDTO> doctorDTOs = acceptedDemandes.stream()
+            .map(demande -> {
+                User doctor = demande.getUser();
+                String photoPath = doctor.getProfilePicturePath();
+               
+                System.out.println("Processing doctor: " + doctor.getEmail() + " with profile picture path: " + photoPath);
+                return DoctorWithSpecialityDTO.builder()
+                    .id(doctor.getId())
+                    .nom(demande.getNom())
+                    .prenom(demande.getPrenom())
+                    .email(demande.getEmail())
+                    .phoneNumber(demande.getTelephone())
+                    .specialite(demande.getSpecialite())
+                    .autreSpecialite(demande.getAutreSpecialite())
+                    .anneeExperience(demande.getAnneeExperience())
+                    .adresseCabinet(demande.getAdresseCabinet())
+                    .villeCabinet(demande.getVilleCabinet())
+                    .codePostalCabinet(demande.getCodePostalCabinet())
+                    .aCabinet(demande.isACabinet())
+                    .photoPath(photoPath)
+                    .build();
+            })
+            .collect(Collectors.toList());
+        
+        System.out.println("Found " + doctorDTOs.size() + " accepted doctors");
+        return ResponseEntity.ok(doctorDTOs);
     }
     
     @RequestMapping(value = "/doctors/accepted", method = RequestMethod.OPTIONS)

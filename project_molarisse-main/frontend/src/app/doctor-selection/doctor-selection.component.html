@@ -6,7 +6,10 @@
     <div *ngIf="doctors.length > 0; else noDoctorsAvailable" class="doctor-list">
       <mat-card *ngFor="let doctor of doctors" class="doctor-card">
         <mat-card-header>
-          <img mat-card-avatar [src]="profileImageService.getProfileImageUrl(doctor.profilePicturePath)" alt="Photo {{ doctor.nom }}">
+          <img mat-card-avatar [src]="profileImageService.getProfileImageUrl(doctor.profilePicturePath)" 
+               (error)="handleImageError($event)" 
+               alt="Photo {{ doctor.nom }}"
+               style="width: 40px; height: 40px; object-fit: cover;">
           <mat-card-title>{{ doctor.nom }} {{ doctor.prenom }}</mat-card-title>
           <mat-card-subtitle>{{ doctor.email }}</mat-card-subtitle>
         </mat-card-header>

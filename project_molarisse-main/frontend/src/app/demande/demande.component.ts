@@ -67,6 +67,8 @@ export class DemandeComponent implements OnInit {
   diplomePreview: string | null = null;
   cabinetPhotoPreview: string | null = null;
   showAutreSpecialite = false;
+  errorMessage: string = '';
+  hasError: boolean = false;
 
   villesTunisie: string[] = [
     'Tunis', 'Sfax', 'Sousse', 'Kairouan', 'Bizerte', 'Gabès', 'Ariana',
@@ -406,32 +408,24 @@ export class DemandeComponent implements OnInit {
     // Store the data in the service
     this.demandeDataService.setDemandeData(demandeData);
 
-    // Show success message
-    this.snackBar.open(
-      'Votre demande a été soumise avec succès',
-      'Fermer',
-      { duration: 5000, panelClass: ['success-snackbar'] }
-    );
-
     // Navigate to the confirmation page
     this.router.navigate(['/dashboard/demande/confirmation']);
   }
 
   private handleError(error: HttpErrorResponse): void {
+    this.isSubmitting = false;
+    this.hasError = true;
     console.error('Error submitting demande:', error);
-
-    let errorMessage = 'Une erreur est survenue lors de la soumission';
-    if (error.status === 409) {
-      errorMessage = 'Vous avez déjà une demande en cours de traitement';
-    } else if (error.error?.message) {
-      errorMessage = error.error.message;
+    
+    if (error.status === 400) {
+      this.errorMessage = 'Veuillez vérifier les informations saisies.';
+    } else if (error.status === 409) {
+      this.errorMessage = 'Une demande existe déjà pour cet utilisateur.';
+    } else {
+      this.errorMessage = 'Une erreur est survenue lors de la vérification de votre demande.';
     }
-
-    this.snackBar.open(
-      errorMessage,
-      'Fermer',
-      { duration: 7000, panelClass: ['error-snackbar'] }
-    );
+    
+    this.showFormErrors();
   }
 
   onReset(): void {
@@ -475,5 +469,10 @@ export class DemandeComponent implements OnInit {
     if (!dateArray || !Array.isArray(dateArray)) return '';
     const [year, month, day, hour, minute] = dateArray;
     return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  }
+
+  dismissError(): void {
+    this.hasError = false;
+    this.errorMessage = '';
   }
 }

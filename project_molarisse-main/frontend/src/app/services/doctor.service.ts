@@ -13,18 +13,19 @@ export class DoctorService {
   constructor(private http: HttpClient) {}
 
   getAllDoctors(): Observable<Doctor[]> {
-    console.log('Fetching doctors from:', `${this.apiUrl}/api/users/doctors`);
-    return this.http.get<Doctor[]>(`${this.apiUrl}/api/users/doctors`);
+    const url = `${this.apiUrl}/api/v1/api/users/doctors`;
+    console.log('Fetching doctors from:', url);
+    return this.http.get<Doctor[]>(url);
   }
 
   getAcceptedDoctors(): Observable<Doctor[]> {
-    const url = `${this.apiUrl}/api/users/doctors/accepted`;
+    const url = `${this.apiUrl}/api/v1/api/users/doctors/accepted`;
     console.log('Fetching accepted doctors from:', url);
     return this.http.get<Doctor[]>(url);
   }
 
   getDoctorById(id: number): Observable<Doctor> {
-    const url = `${this.apiUrl}/api/users/${id}`;
+    const url = `${this.apiUrl}/api/v1/api/users/${id}`;
     console.log('Fetching doctor by ID from:', url);
     return this.http.get<Doctor>(url);
   }

@@ -8,9 +8,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = isBrowser ? localStorage.getItem('access_token') : null;
   console.log('[AuthInterceptor] Found token:', token ? 'Yes' : 'No');
 
-  // Clone the request with withCredentials set to true
+  // Clone the request with CORS headers
   let clonedReq = req.clone({
-    withCredentials: true
+    withCredentials: true,
+    headers: req.headers
+      .set('Content-Type', 'application/json')
+      .set('Accept', 'application/json')
   });
 
   if (token) {

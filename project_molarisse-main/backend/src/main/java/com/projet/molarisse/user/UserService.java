@@ -18,6 +18,9 @@ import com.projet.molarisse.role.RoleRepository;
 import java.util.List;
 import com.projet.molarisse.demande.Demande;
 import com.projet.molarisse.demande.DemandeRepository;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import com.projet.molarisse.dto.DoctorWithSpecialityDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -158,16 +161,50 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> getAcceptedDoctors() {
-        logger.info("Fetching accepted doctors");
-        // Find all approved demandes
-        List<Demande> approvedDemandes = demandeRepository.findByStatus(Demande.Status.APPROVED);
-        // Extract the users (doctors) from the approved demandes
-        List<User> acceptedDoctors = approvedDemandes.stream()
-                                                   .map(Demande::getUser)
-                                                   .filter(user -> user != null && user.getRole().getNom().equals(Role.DOCTOR))
-                                                   .toList();
-        logger.info("Found {} accepted doctors", acceptedDoctors.size());
+    public List<DoctorWithSpecialityDTO> getAcceptedDoctors() {
+        logger.info("Starting getAcceptedDoctors method");
+        
+        // First, get all users with DOCTOR role
+        Role doctorRole = roleRepository.findByNom(Role.DOCTOR)
+                .orElseThrow(() -> new RuntimeException("Doctor role not found"));
+        List<User> allDoctors = userRepository.findByRole(doctorRole);
+        logger.info("Found {} total doctors", allDoctors.size());
+        
+        // Then filter and map to include speciality and location
+        List<DoctorWithSpecialityDTO> acceptedDoctors = allDoctors.stream()
+                .map(doctor -> {
+                    Optional<Demande> approvedDemande = demandeRepository.findByUserAndStatus(doctor, Demande.Status.APPROVED);
+                    if (approvedDemande.isPresent()) {
+                        Demande demande = approvedDemande.get();
+                        String profilePicturePath = "/api/v1/users/profile/picture/" + doctor.getId();
+                        logger.info("Processing doctor with profile picture path: {}", profilePicturePath);
+                        return DoctorWithSpecialityDTO.builder()
+                            .id(doctor.getId())
+                            .nom(doctor.getNom())
+                            .prenom(doctor.getPrenom())
+                            .email(doctor.getEmail())
+                            .phoneNumber(doctor.getPhoneNumber())
+                            .specialite(demande.getSpecialite())
+                            .autreSpecialite(demande.getAutreSpecialite())
+                            .anneeExperience(demande.getAnneeExperience())
+                            .adresseCabinet(demande.getAdresseCabinet())
+                            .villeCabinet(demande.getVilleCabinet())
+                            .codePostalCabinet(demande.getCodePostalCabinet())
+                            .aCabinet(demande.isACabinet())
+                            .photoPath(profilePicturePath)
+                            .build();
+                    }
+                    return null;
+                })
+                .filter(dto -> dto != null)
+                .collect(Collectors.toList());
+        
+        logger.info("Found {} accepted doctors with specialities and locations", acceptedDoctors.size());
         return acceptedDoctors;
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> findById(Integer id) {
+        return userRepository.findById(id);
     }
 }

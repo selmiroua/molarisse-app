@@ -40,15 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
         logger.info("Processing request: {} {} {}", requestMethod, requestPath);
         
         // Skip authentication for public endpoints and OPTIONS requests
-        if(requestPath.contains("/auth") || 
-           requestPath.equals("/api/users/doctors") ||
-           requestPath.equals("/api/users/doctors/accepted") ||
-           requestPath.equals("/api/users/test") ||
-           requestMethod.equals("OPTIONS")) {
-            logger.info("Skipping authentication for public endpoint or OPTIONS request: {} {}", requestMethod, requestPath);
-            filterChain.doFilter(request, response);
-            return;
-        }
+        
         
         // Add CORS headers for preflight requests
         if (requestMethod.equals("OPTIONS")) {

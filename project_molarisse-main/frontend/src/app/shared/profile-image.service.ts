@@ -9,7 +9,9 @@ export class ProfileImageService {
     if (profilePicturePath) {
       try {
         const t = timestamp || new Date().getTime();
-        return `${environment.apiUrl}/api/v1/api/users/profile/picture/${profilePicturePath}?t=${t}`;
+        const url = `${environment.apiUrl}/api/v1/api/users/profile/picture/${profilePicturePath}?t=${t}`;
+        console.log('Generated profile picture URL:', url);
+        return url;
       } catch (error) {
         console.error('Error generating profile picture URL:', error);
         return this.getDefaultImageForRole();

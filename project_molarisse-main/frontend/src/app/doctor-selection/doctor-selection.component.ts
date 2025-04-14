@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // For loading indicator
 import { ProfileImageService } from '../shared/profile-image.service'; // To display doctor images
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-doctor-selection',
@@ -28,6 +29,7 @@ import { ProfileImageService } from '../shared/profile-image.service'; // To dis
 })
 export class DoctorSelectionComponent implements OnInit {
   acceptedDoctors$: Observable<Doctor[]> | undefined;
+  environment = environment; // Make it available to the template
 
   constructor(
     private doctorService: DoctorService,
@@ -36,9 +38,15 @@ export class DoctorSelectionComponent implements OnInit {
 
   ngOnInit(): void {
     this.acceptedDoctors$ = this.doctorService.getAcceptedDoctors();
-    // Optional: Add error handling
+    // Add debugging
     this.acceptedDoctors$.subscribe({
-        error: (err) => console.error('Error loading accepted doctors for selection:', err)
+      next: (doctors) => {
+        doctors.forEach(doctor => {
+          console.log('Doctor:', doctor.nom, 'Photo path:', doctor.photoPath);
+          console.log('Full photo URL:', environment.apiUrl + doctor.photoPath);
+        });
+      },
+      error: (err) => console.error('Error loading accepted doctors for selection:', err)
     });
   }
 
@@ -49,5 +57,10 @@ export class DoctorSelectionComponent implements OnInit {
     console.log('Secretary selected doctor:', doctor);
     // Example: Navigate to a hypothetical dashboard for this doctor
     // this.router.navigate(['/secretary/doctor-workspace', doctor.id]);
+  }
+
+  handleImageError(event: any): void {
+    console.error('Image failed to load:', event.target.src);
+    event.target.src = 'assets/images/default-avatar.png';
   }
 }

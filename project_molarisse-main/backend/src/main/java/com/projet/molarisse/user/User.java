@@ -41,6 +41,8 @@ public class User implements UserDetails, Principal {
     private String profilePicturePath;
     private boolean accountLocked;
     private boolean enabled;
+    @Builder.Default
+    private boolean visible = true;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)

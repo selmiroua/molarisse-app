@@ -27,8 +27,7 @@ export class SecretaireDashboardComponent implements OnInit {
   userProfile?: UserProfile;
   isMenuOpen = false;
   isProfileDropdownOpen = false;
-  activeSection = 'dashboard';
-  showDemands = false;
+  activeSection = '';
   private _imageTimestamp: number | null = null;
 
   constructor(
@@ -76,21 +75,13 @@ export class SecretaireDashboardComponent implements OnInit {
     this.isProfileDropdownOpen = !this.isProfileDropdownOpen;
   }
 
-  showDashboard(): void {
-    this.activeSection = 'dashboard';
-    this.showDemands = false;
-    this.isProfileDropdownOpen = false;
-  }
-
   showProfile(): void {
     this.activeSection = 'profile';
-    this.showDemands = false;
     this.isProfileDropdownOpen = false;
   }
 
   showDemande(): void {
     this.activeSection = 'demande';
-    this.showDemands = false;
     this.isProfileDropdownOpen = false;
   }
 

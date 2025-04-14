@@ -2,69 +2,75 @@
   <div class="animated-background"></div>
 
   <!-- Sidebar -->
-  <aside class="sidebar" [class.open]="isMenuOpen">
+  <aside class="sidebar" [class.open]="isMenuOpen" [class.disabled]="!isApproved">
     <div class="sidebar-header">
       <div class="logo">
         <img src="assets/images/mmolarissee.png" width="60" height="150">
-          <span>Molarisse</span>
+        <span>Molarisse</span>
       </div>
     </div>
 
-    <nav class="sidebar-nav">
-      <!-- Existing links -->
-      <a (click)="showDashboard()" [class.active]="activeSection === 'dashboard'">
-        <i class="fas fa-th-large"></i> Dashboard
+    <nav class="sidebar-nav" [class.disabled]="!isApproved">
+      <a (click)="showDashboard()" [class.active]="activeSection === 'dashboard'" [class.disabled]="!isApproved">
+        <i class="fas fa-th-large"></i> <span>Dashboard</span>
       </a>
-      <a (click)="showPatients()" [class.active]="activeSection === 'patients'">
-        <i class="fas fa-user-injured"></i> Patients
+      <a (click)="showPatients()" [class.active]="activeSection === 'patients'" [class.disabled]="!isApproved">
+        <i class="fas fa-user-injured"></i> <span>Patients</span>
       </a>
-      <a (click)="showAppointments()" [class.active]="activeSection === 'appointments'">
-        <i class="fas fa-calendar-alt"></i> Appointments
+      <a (click)="showAppointments()" [class.active]="activeSection === 'appointments'" [class.disabled]="!isApproved">
+        <i class="fas fa-calendar-alt"></i> <span>Appointments</span>
       </a>
-      <a (click)="showTreatments()" [class.active]="activeSection === 'treatments'">
-        <i class="fas fa-tooth"></i> Treatments
+      <a (click)="showTreatments()" [class.active]="activeSection === 'treatments'" [class.disabled]="!isApproved">
+        <i class="fas fa-tooth"></i> <span>Treatments</span>
       </a>
-      <a (click)="showPharmacy()" [class.active]="activeSection === 'pharmacy'">
-        <i class="fas fa-prescription-bottle-alt"></i> Pharmacy
+      <a (click)="showPharmacy()" [class.active]="activeSection === 'pharmacy'" [class.disabled]="!isApproved">
+        <i class="fas fa-prescription-bottle-alt"></i> <span>Pharmacy</span>
       </a>
-      <a (click)="showHistory()" [class.active]="activeSection === 'history'">
-        <i class="fas fa-history"></i> History
+      <a (click)="showHistory()" [class.active]="activeSection === 'history'" [class.disabled]="!isApproved">
+        <i class="fas fa-history"></i> <span>History</span>
       </a>
-      <a (click)="showHelpCentre()" [class.active]="activeSection === 'helpCentre'">
-        <i class="fas fa-question-circle"></i> Help Centre
+      <a (click)="showHelpCentre()" [class.active]="activeSection === 'helpCentre'" [class.disabled]="!isApproved">
+        <i class="fas fa-question-circle"></i> <span>Help Centre</span>
       </a>
-      <a (click)="showSettings()" [class.active]="activeSection === 'settings'">
-        <i class="fas fa-cog"></i> Settings
+      <a (click)="showSettings()" [class.active]="activeSection === 'settings'" [class.disabled]="!isApproved">
+        <i class="fas fa-cog"></i> <span>Settings</span>
       </a>
-      <!-- Add the demande link here -->
       <a (click)="showDemande()" [class.active]="activeSection === 'demande'">
-        <i class="fas fa-user-plus"></i> Demande
+        <i class="fas fa-user-plus"></i> <span>Demande</span>
       </a>
     </nav>
-
-
   </aside>
 
   <!-- Main Content -->
   <main class="main-content">
+    <!-- Warning Banner -->
+    <div class="approval-warning" *ngIf="!isApproved">
+      <i class="fas fa-exclamation-circle"></i>
+      <p>
+        Votre accès est limité jusqu'à l'approbation de votre demande. Veuillez consulter la section 
+        <span class="demande-link" (click)="showDemande()">Demande</span> 
+        pour plus d'informations.
+      </p>
+    </div>
+
     <!-- Header -->
     <header class="main-header">
       <div class="header-left">
-        <button class="menu-toggle" (click)="toggleMenu()">
+        <button class="menu-toggle" (click)="toggleMenu()" [disabled]="!isApproved">
           <i class="fas fa-bars"></i>
         </button>
-        <div class="search-container">
+        <div class="search-container" [class.disabled]="!isApproved">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search..." />
+          <input type="text" placeholder="Search..." [disabled]="!isApproved" />
         </div>
       </div>
 
       <div class="header-right">
-        <div class="notification-icon">
+        <div class="notification-icon" [class.disabled]="!isApproved">
           <i class="fas fa-envelope"></i>
           <span class="badge">1</span>
         </div>
-        <div class="notification-icon">
+        <div class="notification-icon" [class.disabled]="!isApproved">
           <i class="fas fa-bell"></i>
           <span class="badge">3</span>
         </div>
@@ -73,7 +79,7 @@
             <div class="avatar">
               <img [src]="getProfileImageUrl()" [alt]="userName$ | async">
             </div>
-            <span>{{ userName$ | async }}</span>
+            <span class="username">{{ userName$ | async }}</span>
             <i class="fas fa-chevron-down"></i>
           </button>
           <div class="dropdown-content" [class.show]="isProfileDropdownOpen">
@@ -86,113 +92,116 @@
     </header>
 
     <!-- Dashboard Content -->
-    <div class="content" *ngIf="activeSection === 'dashboard'">
-      <!-- Welcome Banner -->
-      <div class="welcome-banner">
-        <div class="welcome-info">
-          <h3>Good {{ timeOfDay }},</h3>
-          <h1>{{ userName$ | async }}</h1>
-          <p>Your schedule today.</p>
+    <div class="content">
+  
+      <!-- Regular dashboard content when approved -->
+      <div *ngIf="isApproved && activeSection === 'dashboard'" class="dashboard-section">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <div class="welcome-info">
+            <h3>Good {{ timeOfDay }},</h3>
+            <h1>{{ userName$ | async }}</h1>
+            <p>Your schedule today.</p>
 
-          <div class="stats-circles">
-            <div class="stat-circle appointments">
-              <div class="circle-icon">
-                <i class="fas fa-tooth"></i>
+            <div class="stats-circles">
+              <div class="stat-circle appointments">
+                <div class="circle-icon">
+                  <i class="fas fa-tooth"></i>
+                </div>
+                <div class="circle-value">{{ appointmentsCount }}</div>
+                <div class="circle-label">Appointments</div>
               </div>
-              <div class="circle-value">{{ appointmentsCount }}</div>
-              <div class="circle-label">Appointments</div>
-            </div>
 
-            <div class="stat-circle surgeries">
-              <div class="circle-icon">
-                <i class="fas fa-syringe"></i>
+              <div class="stat-circle surgeries">
+                <div class="circle-icon">
+                  <i class="fas fa-syringe"></i>
+                </div>
+                <div class="circle-value">{{ surgeriesCount }}</div>
+                <div class="circle-label">Procedures</div>
               </div>
-              <div class="circle-value">{{ surgeriesCount }}</div>
-              <div class="circle-label">Procedures</div>
             </div>
           </div>
-        </div>
-        <div class="welcome-illustration">
-          <img src="assets/images/wave-pattern.png" alt="Dental Illustration">
+          <div class="welcome-illustration">
+            <img src="assets/images/wave-pattern.png" alt="Dental Illustration">
+          </div>
         </div>
       </div>
 
+      <!-- Requests Content -->
+      <div class="content" *ngIf="activeSection === 'requests'">
+        <div class="requests-container">
+          <h2>Demandes de Rejoindre</h2>
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let request of requests">
+                <td>{{ request.name }}</td>
+                <td>{{ request.email }}</td>
+                <td>
+                  <span [class]="request.status">{{ request.status }}</span>
+                </td>
+                <td>
+                  <button *ngIf="request.status === 'en cours'" (click)="acceptRequest(request)">Accepter</button>
+                  <button *ngIf="request.status === 'en cours'" (click)="rejectRequest(request)">Refuser</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
+      <!-- Profile Content -->
+      <div *ngIf="isApproved && activeSection === 'profile'" class="profile-section">
+        <app-profile></app-profile>
+      </div>
+
+      <!-- Patients Content -->
+      <div *ngIf="activeSection === 'patients'" class="patients-section">
+        <!-- Patients content here -->
+      </div>
+
+      <!-- Appointments Content -->
+      <div *ngIf="isApproved && activeSection === 'appointments'" class="appointments-section">
+        <app-appointment-list [userRole]="'doctor'"></app-appointment-list>
+      </div>
+
+      <!-- Treatments Content -->
+      <div *ngIf="activeSection === 'treatments'" class="treatments-section">
+        <!-- Treatments content here -->
+      </div>
+
+      <!-- Pharmacy Content -->
+      <div *ngIf="activeSection === 'pharmacy'" class="pharmacy-section">
+        <!-- Pharmacy content here -->
+      </div>
+
+      <!-- History Content -->
+      <div *ngIf="activeSection === 'history'" class="history-section">
+        <!-- History content here -->
+      </div>
+
+      <!-- Help Centre Content -->
+      <div *ngIf="activeSection === 'helpCentre'" class="help-centre-section">
+        <!-- Help Centre content here -->
+      </div>
+
+      <!-- Settings Content -->
+      <div *ngIf="isApproved && activeSection === 'settings'" class="settings-section">
+        <!-- Settings content here -->
+      </div>
+
+      <!-- Demande Content -->
+      <div *ngIf="activeSection === 'demande'" class="demande-section">
+        <app-demande></app-demande>
+      </div>
     </div>
-    <!-- Requests Content -->
-<div class="content" *ngIf="activeSection === 'requests'">
-  <div class="requests-container">
-    <h2>Demandes de Rejoindre</h2>
-    <table class="requests-table">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Email</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let request of requests">
-          <td>{{ request.name }}</td>
-          <td>{{ request.email }}</td>
-          <td>
-            <span [class]="request.status">{{ request.status }}</span>
-          </td>
-          <td>
-            <button *ngIf="request.status === 'en cours'" (click)="acceptRequest(request)">Accepter</button>
-            <button *ngIf="request.status === 'en cours'" (click)="rejectRequest(request)">Refuser</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-    <!-- Profile Content -->
-    <div class="content" *ngIf="activeSection === 'profile'">
-      <app-profile></app-profile>
-    </div>
-
-    <!-- Patients Content -->
-    <div class="content" *ngIf="activeSection === 'patients'">
-      <!-- Patients content here -->
-    </div>
-
-    <!-- Appointments Content -->
-    <div class="content" *ngIf="activeSection === 'appointments'">
-      <!-- Appointments content here -->
-    </div>
-
-    <!-- Treatments Content -->
-    <div class="content" *ngIf="activeSection === 'treatments'">
-      <!-- Treatments content here -->
-    </div>
-
-    <!-- Pharmacy Content -->
-    <div class="content" *ngIf="activeSection === 'pharmacy'">
-      <!-- Pharmacy content here -->
-    </div>
-
-    <!-- History Content -->
-    <div class="content" *ngIf="activeSection === 'history'">
-      <!-- History content here -->
-    </div>
-
-    <!-- Help Centre Content -->
-    <div class="content" *ngIf="activeSection === 'helpCentre'">
-      <!-- Help Centre content here -->
-    </div>
-
-    <!-- Settings Content -->
-    <div class="content" *ngIf="activeSection === 'settings'">
-      <!-- Settings content here -->
-    </div>
-    <div class="content" *ngIf="activeSection === 'demande'">
-      <app-demande></app-demande>
-
-    </div>
-
-
   </main>
 </div>
+

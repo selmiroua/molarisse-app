@@ -69,6 +69,13 @@
       </mat-card-header>
 
       <mat-card-content>
+        <!-- Show error message only when there's an actual error -->
+        <div *ngIf="hasError && errorMessage" class="error-message">
+          <mat-icon color="warn">error</mat-icon>
+          <p>{{ errorMessage }}</p>
+          <button mat-button color="warn" (click)="dismissError()">Fermer</button>
+        </div>
+
         <form [formGroup]="demandeForm"
               (ngSubmit)="onSubmit()"
               #formDirective="ngForm"

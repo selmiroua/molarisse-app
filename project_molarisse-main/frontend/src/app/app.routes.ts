@@ -15,7 +15,7 @@ import { DemandeComponent } from './demande/demande.component';
 import { DemandeConfirmationComponent } from './demande/demande-confirmation.component';
 import { DemandeManagementComponent } from "./demande-management/demande-management.component";
 import { LandingComponent } from './landing/landing.component';
-import { DoctorSelectionComponent } from './doctor-selection/doctor-selection.component';
+import { DoctorListComponent } from './secretary/doctor-list/doctor-list.component';
 
 export const routes: Routes = [
   {
@@ -35,18 +35,18 @@ export const routes: Routes = [
     component: ActivateAccountComponent
   },
   {
-    path: 'select-doctor',
-    component: DoctorSelectionComponent,
+    path: 'espace-secretaire',
+    component: DoctorListComponent,
     canActivate: [AuthGuard],
     data: { role: 'secretaire' }
   },
   {
     path: 'dashboard',
-    canActivate: [AuthGuard], // Protect the entire dashboard
+    canActivate: [AuthGuard],
     children: [
       {
         path: 'admin',
-       component: AdminDashboardComponent,
+        component: AdminDashboardComponent,
         data: { role: 'admin' },
       },
       {
@@ -84,7 +84,7 @@ export const routes: Routes = [
         component: ProfileComponent
       },
       {
-        path: 'demande', // Nested under /dashboard
+        path: 'demande',
         component: DemandeComponent
       },
       {
@@ -97,7 +97,6 @@ export const routes: Routes = [
       }
     ]
   },
-
   {
     path: '',
     redirectTo: '/landing',

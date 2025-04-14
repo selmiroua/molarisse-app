@@ -3,9 +3,9 @@ package com.projet.molarisse.demande;
 import com.projet.molarisse.service.FileStorageService;
 import com.projet.molarisse.user.User;
 import com.projet.molarisse.user.UserService;
-import com.projet.molarisse.notification.Notification;
-import com.projet.molarisse.notification.NotificationRepository;
-import jakarta.transaction.Transactional;
+//import com.projet.molarisse.notification.Notification;
+//import com.projet.molarisse.notification.NotificationRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +22,8 @@ public class DemandeService {
     private final DemandeRepository demandeRepository;
     private final FileStorageService fileStorageService;
     private final UserService userService;
-    private final NotificationRepository notificationRepository;
+    //private final NotificationRepository notificationRepository;
+    private static final Logger logger = LoggerFactory.getLogger(DemandeService.class);
 
     @Transactional
     public DemandeResponse submitDemande(DemandeRequest request) {
@@ -64,10 +67,10 @@ public class DemandeService {
         Demande savedDemande = demandeRepository.save(demande);
 
         // Create a notification for the admin
-        Notification notification = new Notification();
-        notification.setMessage("New demande submitted by " + currentUser.getNom());
-        notification.setRecipient(userService.getAdminUser()); // Assume getAdminUser fetches the admin
-        notificationRepository.save(notification);
+       // Notification notification = new Notification();
+        //notification.setMessage("New demande submitted by " + currentUser.getNom());
+        //notification.setRecipient(userService.getAdminUser()); // Assume getAdminUser fetches the admin
+        //notificationRepository.save(notification);
 
         return new DemandeResponse(savedDemande);
     }
@@ -88,10 +91,10 @@ public class DemandeService {
         Demande updatedDemande = demandeRepository.save(demande);
 
         // Create notification for the user
-        Notification notification = new Notification();
-        notification.setMessage("Your demande has been " + newStatus.toString().toLowerCase());
-        notification.setRecipient(demande.getUser());
-        notificationRepository.save(notification);
+        //Notification notification = new Notification();
+        // notification.setMessage("Your demande has been " + newStatus.toString().toLowerCase());
+        //notification.setRecipient(demande.getUser());
+        //notificationRepository.save(notification);
 
         return new DemandeResponse(updatedDemande);
     }
@@ -110,10 +113,42 @@ public class DemandeService {
                 .map(DemandeResponse::new);
     }
 
+    @Transactional(readOnly = true)
     public List<DemandeResponse> findAllAcceptedDoctors() {
+        logger.info("Fetching all accepted doctors");
         List<Demande> acceptedDemandes = demandeRepository.findByStatus(Demande.Status.APPROVED);
-        return acceptedDemandes.stream()
-                .map(demande -> new DemandeResponse(demande))
+        logger.info("Found {} accepted demandes", acceptedDemandes.size());
+        
+        List<DemandeResponse> responses = acceptedDemandes.stream()
+                .map(demande -> {
+                    logger.info("Processing demande for doctor: {} {} (Status: {})", 
+                              demande.getNom(), 
+                              demande.getPrenom(), 
+                              demande.getStatus());
+                    logger.info("User ID: {}", demande.getUser().getId());
+                    logger.info("Specialite: {}", demande.getSpecialite());
+                    logger.info("Annee Experience: {}", demande.getAnneeExperience());
+                    
+                    if (demande.isACabinet()) {
+                        logger.info("Doctor has cabinet - Details: {} - {}, {}", 
+                                  demande.getNomCabinet(),
+                                  demande.getAdresseCabinet(), 
+                                  demande.getVilleCabinet(), 
+                                  demande.getCodePostalCabinet());
+                    } else {
+                        logger.info("Doctor does not have a cabinet");
+                        // Set cabinet fields to null if doctor doesn't have a cabinet
+                        demande.setNomCabinet(null);
+                        demande.setAdresseCabinet(null);
+                        demande.setVilleCabinet(null);
+                        demande.setCodePostalCabinet(null);
+                    }
+                    
+                    return new DemandeResponse(demande);
+                })
                 .collect(Collectors.toList());
+        
+        logger.info("Returning {} doctor responses", responses.size());
+        return responses;
     }
 }
